@@ -1147,6 +1147,23 @@ class BldcServo::Impl {
     aux2_port_->ISR_EndAnalogSample();
   }
 
+  void updateHydraulicCompensation() {
+    printf("Current torque reading = %6.3f", status_.torque_Nm);
+    Kp = 0.0;   // Position Stiffness gain
+    Kd = 0.0;   // Damping gain
+    qd = next_data_->position_relative_raw;   // desired position
+    dqd = next_data_->velocity;  // desired velocity
+    q = status_.position_relative_raw ; // current position
+    dq = status_.velocity; // current velocity
+
+    // Spring Damper equation
+    td = Kp * (qd - q) + Kd * (dqd - dq);
+    // Calculate additional torque required to be applied by Hydraulics
+    thyq = td - status_.torque_Nm;
+    // Relate torque to PWM
+    continue;
+  }
+
   // This is called from the ISR.
   void ISR_CalculateCurrentState(const SinCos& sin_cos) MOTEUS_CCM_ATTRIBUTE {
     status_.cur1_A = (status_.adc_cur1_raw - status_.adc_cur1_offset) * adc_scale_;
@@ -1173,7 +1190,11 @@ class BldcServo::Impl {
         motor_position_->config()->rotor_to_output_ratio) : 0.0f;
     if (!is_torque_on) {
       status_.torque_error_Nm = 0.0f;
+    } else {
+      updateHydraulicCompensation()
     }
+
+    
 
     // As of firmware ABI 0x010a moteus records motor Kv values that
     // correspond roughly with open loop oscilloscope measurements and
