@@ -1201,7 +1201,7 @@ class BldcServo::Impl {
       status_.torque_error_Nm = 0.0f;
     } else {
       // updateHydraulicCompensation()
-      printf("Torque = %6.3f Nm", (double)status_.torque_Nm);
+      // printf("Torque = %6.3f Nm", (double)status_.torque_Nm);
     }
 
     
