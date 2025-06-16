@@ -1,0 +1,1 @@
+tools/bazel build --config=target //fw:flash
