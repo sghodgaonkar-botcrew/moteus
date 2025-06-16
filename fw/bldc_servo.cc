@@ -1147,22 +1147,31 @@ class BldcServo::Impl {
     aux2_port_->ISR_EndAnalogSample();
   }
 
-  void updateHydraulicCompensation() {
-    printf("Current torque reading = %6.3f", status_.torque_Nm);
-    Kp = 0.0;   // Position Stiffness gain
-    Kd = 0.0;   // Damping gain
-    qd = next_data_->position_relative_raw;   // desired position
-    dqd = next_data_->velocity;  // desired velocity
-    q = status_.position_relative_raw ; // current position
-    dq = status_.velocity; // current velocity
+  // void updateHydraulicCompensation() {
+  //   printf("Current torque reading = %6.3f", status_.torque_Nm);
+  //   float Kp = 0.0;   // Position Stiffness gain 5 - 100
+  //   float Kd = 0.0;   // Damping gain 0.1 - 10
+  //   auto qd = next_data_->position_relative_raw;   // desired position
+  //   auto dqd = next_data_->velocity;  // desired velocity
+  //   auto q = status_.position_relative_raw ; // current position
+  //   auto dq = status_.velocity; // current velocity
+  //   float gravity = 0.0f; // Nominal value of gravity that needs to be computed using simulation
 
-    // Spring Damper equation
-    td = Kp * (qd - q) + Kd * (dqd - dq);
-    // Calculate additional torque required to be applied by Hydraulics
-    thyq = td - status_.torque_Nm;
-    // Relate torque to PWM
-    continue;
-  }
+  //   // Spring Damper equation (Kp and Kd need to be tuned well)
+  //   float td = Kp * (qd - q) + Kd * (dqd - dq) + gravity;
+  //   // Calculate additional torque required to be applied by Hydraulics
+  //   float thyq = td - status_.torque_Nm;
+  //   /* Relate torque to PWM - 
+  //   Once we find the torque needed to be supplied to the hydraulics, we can relate it to the torque range available on the hydraulic actuator. 
+  //   We must find the percentage that the required torque is of the max torque and that percentage would be proportional to the PWM duty cycle. 
+  //   Using this, it a simple conversion to a range of 0 - 255 to set the duty cycle that can be supplied to the motor driver drv8873 and it should just work!
+  //   */
+  //  // 50% and under
+  //  // Gravity is always on hydraulics
+  //   // Need to figure out what pin and value mean in this context 
+  //   aux1_port_.WritePwmOut(pin, ReadPwm(value));
+  //   continue;
+  // }
 
   // This is called from the ISR.
   void ISR_CalculateCurrentState(const SinCos& sin_cos) MOTEUS_CCM_ATTRIBUTE {
@@ -1191,7 +1200,8 @@ class BldcServo::Impl {
     if (!is_torque_on) {
       status_.torque_error_Nm = 0.0f;
     } else {
-      updateHydraulicCompensation()
+      // updateHydraulicCompensation()
+      printf("Torque = %6.3f Nm", (double)status_.torque_Nm);
     }
 
     
