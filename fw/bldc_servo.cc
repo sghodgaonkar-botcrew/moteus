@@ -588,6 +588,9 @@ class BldcServo::Impl {
       main_motor_position_epoch_ = motor_position_->status().epoch;
       UpdateConfig();
     }
+    printf("Torque = %6.3f Nm\n", (double)status_.torque_Nm);
+    // moteus::board_debug::WriteMessage("torque", status_.torque_Nm);
+    // moteus::BoardDebug::WriteMessage();
   }
 
   void SetOutputPositionNearest(float position) {
@@ -1199,10 +1202,11 @@ class BldcServo::Impl {
         motor_position_->config()->rotor_to_output_ratio) : 0.0f;
     if (!is_torque_on) {
       status_.torque_error_Nm = 0.0f;
-    } else {
-      // updateHydraulicCompensation()
-      // printf("Torque = %6.3f Nm", (double)status_.torque_Nm);
-    }
+    } 
+    // else {
+    //   // updateHydraulicCompensation()
+    //   // printf("Torque = %6.3f Nm", (double)status_.torque_Nm);
+    // }
 
     
 
