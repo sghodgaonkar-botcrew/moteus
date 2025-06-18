@@ -6,32 +6,48 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/). -->
  
 ## [Unreleased] - 2025-06-18
- 
-Here we write upgrading notes for brands. It's a team effort to make them as
-straightforward as possible.
- 
+  
 ### Added
 - **bldc_servo.cc**
-    - Monitor servo torque and `exit(1)` when the `status_.torque_Nm` is greater than half the `max_torque_Nm`
-    - Send a steady output of 100% Duty Cycle PWM on pin 3 of aux2 using `aux2_port_->WritePwmOut(3, 1.0);` <br>
-    (Note: use `conf aux2.pin.3.mode 17` to set the **PWM Output** mode and `conf aux2.pin.3.pull 1` to use the **Pullup Resistor**)
-    - ***UNTESTED*** Reading an analog signal on pin 2 of Aus aux2 using `aux2_port_->status()->analog_inputs[2];`. <br>
-    (Note: use `conf aux2.pin.2.mode 16` to set the **Analog input**)
+  - Implemented torque monitoring logic: firmware will terminate (`exit(1)`) if `status_.torque_Nm` exceeds 50% of `max_torque_Nm`.
+  - Added steady PWM output capability on pin 3 of `aux2` using:
+    ```cpp
+    aux2_port_->WritePwmOut(3, 1.0);
+    ```
+    **Configuration required:**
+    ```bash
+    conf aux2.pin.3.mode 17     # Set pin mode to PWM Output
+    conf aux2.pin.3.pull 1      # Enable pull-up resistor
+    ```
+  - Preliminary implementation for reading analog input from pin 2 of `aux2`:
+    ```cpp
+    aux2_port_->status()->analog_inputs[2];
+    ```
+    **Configuration required:**
+    ```bash
+    conf aux2.pin.2.mode 16     # Set pin mode to Analog Input
+    ```
+    *Note: Analog read functionality is currently untested.*
 
 - **bldc_servo_structs.h**
-    - Included the following parameters for the hydraulic actuator at each joint - 
-        1. `float hyq_actual_dist = 0.0f // meters`
-        2. `float hyq_base_dist = 0.0f // meters`
-        3. `float hyq_max_pressure = 0.0f // PSI`
-        4. `float hyq_bore_dia = 0.0f // meters` 
-    
-        These parameters can be set using the command <br>`conf set servo\.(hyq_actual_dist|hyq_base_dist|hyq_max_pressure|hyq_bore_dia) [-+]?\d+(\.\d+)?
-`
- 
+  - Introduced configuration parameters for hydraulic actuator integration:
+    ```cpp
+    float hyq_actual_dist = 0.0f;  // meters
+    float hyq_base_dist = 0.0f;    // meters
+    float hyq_max_pressure = 0.0f; // PSI
+    float hyq_bore_dia = 0.0f;     // meters
+    ```
+  **Configuration required:**
+    ```bash
+    conf set servo.(hyq_actual_dist|hyq_base_dist|hyq_max_pressure|hyq_bore_dia) <floating point value>
+    ```
+
 ### Changed
- *NA*
+_None_
+
 ### Fixed
- *NA*
+_None_
+
 <!-- ## [1.2.4] - 2017-03-15
   
 Here we would have the update steps for 1.2.4 for people to follow.
