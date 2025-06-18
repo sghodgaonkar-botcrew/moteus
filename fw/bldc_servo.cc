@@ -2199,18 +2199,20 @@ class BldcServo::Impl {
 
     control_.torque_Nm = limited_torque_Nm;
     status_.torque_error_Nm = status_.torque_Nm - control_.torque_Nm ;
-    aux2_port_->WritePwmOut(2, 0.0);
+    aux2_port_->WritePwmOut(3, 0.0);
     // Exit if the torque is greater than Half of max torque
     if (abs(status_.torque_Nm) > (0.5f * max_torque_Nm)) {
-      aux2_port_->WritePwmOut(2, 0.0);
+      aux2_port_->WritePwmOut(3, 0.0);
+      // return;
       exit(1);
     } else {
       // output PWM signal of 0.5 duty cycle
-      // aux2_port_->config()->pins[2].mode = aux::Pin::Mode::kPwmOut;
-      // aux2_port_->config()->pins[2].pull = aux::Pin::Pull::kPullUp;
-      // aux2_port_->HandleConfigUpdate();
-      aux2_port_->WritePwmOut(2, 1.0);
+      aux2_port_->WritePwmOut(3, 1.0);
     }
+
+    //Analog read so that you can read pressure
+    //Remember to conf pin2 of AUX2 to mode16 pull1
+    aux2_port_->status()->analog_inputs[2];
  
     const float limited_q_A =
         torque_to_current(limited_torque_Nm *

@@ -581,6 +581,12 @@ struct BldcServoConfig {
   // debug UART at full control rate.
   uint32_t emit_debug = 0;
 
+  // User defined Configuration Parameters for Hydraulic Actuator
+  float hyq_actual_dist = 0.0f; // meters
+  float hyq_base_dist = 0.0f; // meters
+  float hyq_max_pressure = 0.0f; // PSI
+  float hyq_bore_dia = 0.0f; // meters 
+
   BldcServoConfig() {
     pid_dq.kp = 0.005f;
     pid_dq.ki = 30.0f;
@@ -638,6 +644,10 @@ struct BldcServoConfig {
     a->Visit(MJ_NVP(velocity_zero_capture_threshold));
     a->Visit(MJ_NVP(timing_fault));
     a->Visit(MJ_NVP(emit_debug));
+    a->Visit(MJ_NVP(hyq_actual_dist));
+    a->Visit(MJ_NVP(hyq_base_dist));
+    a->Visit(MJ_NVP(hyq_max_pressure));
+    a->Visit(MJ_NVP(hyq_bore_dia)); 
   }
 
   static float invalid_float() {
